@@ -8,6 +8,7 @@ import { Checkbox } from "./ui/checkbox";
 import { Badge } from "./ui/badge";
 import { toast } from "sonner";
 
+
 export default function TaskList() {
   const router = useRouter();
 
@@ -167,40 +168,6 @@ export default function TaskList() {
             </div>
           );
         })
-      )}
-
-      {/* Categories Section */}
-      <h1 className="font-extrabold text-2xl mt-6 mb-3">Categories</h1>
-      {categories.length === 0 ? (
-        <p className="text-center text-muted-foreground">
-          No categories found.
-        </p>
-      ) : (
-        <div className="flex flex-wrap gap-2">
-          {categories.map((category) => (
-            <Badge
-              key={category.id}
-              style={{ backgroundColor: category.color }}
-            >
-              {category.name}
-            </Badge>
-          ))}
-        </div>
-      )}
-
-      {/* Projects Section */}
-      <h1 className="font-extrabold text-2xl mt-6 mb-3">Projects</h1>
-      {projects.length === 0 ? (
-        <p className="text-center text-muted-foreground">No projects found.</p>
-      ) : (
-        <div className="grid gap-4">
-          {projects.map((project) => (
-            <div key={project.id} className="p-4 border rounded-lg shadow-sm">
-              <h3 className="text-lg font-bold">{project.name}</h3>
-              <p className="text-sm text-gray-600">{project.description}</p>
-            </div>
-          ))}
-        </div>
       )}
     </div>
   );

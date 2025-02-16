@@ -80,3 +80,21 @@
     @apply bg-background text-foreground;
   }
 }
+
+.neon-border {
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 0 8px -2px rgba(59, 130, 246, 0.2);
+  transition: box-shadow 0.3s ease;
+}
+
+.neon-border:hover {
+  box-shadow: 0 0 12px -2px rgba(59, 130, 246, 0.3);
+}
+
+.dark .neon-border {
+  box-shadow: 0 0 8px -2px rgba(99, 102, 241, 0.2);
+}
+
+.dark .neon-border:hover {
+  box-shadow: 0 0 12px -2px rgba(99, 102, 241, 0.3);
+}

@@ -1,130 +1,22 @@
-// "use client";
-
-// import { useState } from "react";
-// import { useRouter } from "next/navigation";
-// import { Button } from "./ui/button";
-// import { Input } from "./ui/input";
-// import { Textarea } from "./ui/textarea";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "./ui/select";
-// import { toast } from "sonner";
-
-// export default function TaskForm() {
-//   const router = useRouter();
-//   const [loading, setLoading] = useState(false);
-//   const [task, setTask] = useState({
-//     title: "",
-//     description: "",
-//     priority: "0",
-//     category: "",
-//     project: "",
-//   });
-
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     setLoading(true);
-//     try {
-//       const response = await fetch("/api/tasks", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({
-//           ...task,
-//           priority: parseInt(task.priority),
-//         }),
-//       });
-
-//       if (!response.ok) {
-//         throw new Error("Failed to create task");
-//       }
-
-//       setTask({
-//         title: "",
-//         description: "",
-//         priority: "0",
-//         category: "",
-//         project: "",
-//       });
-//       toast.success("Task created successfully");
-//       router.refresh();
-//     } catch (error) {
-//       console.error("Failed to create task:", error);
-//       toast.error("Failed to create task. Please try again.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <form
-//       onSubmit={handleSubmit}
-//       className="space-y-4 bg-card p-6 rounded-lg shadow-sm"
-//     >
-//       <div>
-//         <Input
-//           placeholder="Task title"
-//           value={task.title}
-//           onChange={(e) => setTask({ ...task, title: e.target.value })}
-//           required
-//         />
-//       </div>
-//       <div>
-//         <Textarea
-//           placeholder="Task description"
-//           value={task.description}
-//           onChange={(e) => setTask({ ...task, description: e.target.value })}
-//           className="min-h-[100px]"
-//         />
-//       </div>
-//       <div>
-//         <Select
-//           value={task.priority}
-//           onValueChange={(value: any) => setTask({ ...task, priority: value })}
-//         >
-//           <SelectTrigger>
-//             <SelectValue placeholder="Select priority" />
-//           </SelectTrigger>
-//           <SelectContent>
-//             <SelectItem value="0">Low</SelectItem>
-//             <SelectItem value="1">Medium</SelectItem>
-//             <SelectItem value="2">High</SelectItem>
-//           </SelectContent>
-//         </Select>
-//       </div>
-//       <div>
-//         <Input
-//           placeholder="Category"
-//           value={task.category}
-//           onChange={(e) => setTask({ ...task, category: e.target.value })}
-//           required
-//         />
-//       </div>
-//       <div>
-//         <Input
-//           placeholder="Project"
-//           value={task.project}
-//           onChange={(e) => setTask({ ...task, project: e.target.value })}
-//           required
-//         />
-//       </div>
-//       <Button type="submit" disabled={loading}>
-//         {loading ? "Creating..." : "Create Task"}
-//       </Button>
-//     </form>
-//   );
-// }
-
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
+import { toast } from "sonner";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
 import {
   Select,
   SelectContent,
@@ -132,76 +24,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { toast } from "sonner";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
-// Define TypeScript types for categories & projects
-interface Category {
-  id: number;
-  name: string;
-}
-
-interface Project {
-  id: number;
-  name: string;
-}
+// Zod schema for form validation
+const formSchema = z.object({
+  title: z.string().min(1, "Title is required").max(100),
+  description: z.string().max(500).optional(),
+  project: z.string().max(100).optional(),
+  priority: z.enum(["0", "1", "2"]),
+  dueDate: z.date().optional(),
+});
 
 export default function TaskForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [isDataLoading, setIsDataLoading] = useState(true); // Track API loading state
 
-  const [task, setTask] = useState({
-    title: "",
-    description: "",
-    priority: "0",
-    categoryId: "",
-    projectId: "",
+  // Initialize the form
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      project: "",
+      priority: "0",
+      dueDate: undefined,
+    },
   });
 
-  // Fetch categories & projects on first render
-  useEffect(() => {
-    const fetchCategoriesAndProjects = async () => {
-      try {
-        const [categoriesRes, projectsRes] = await Promise.all([
-          fetch("/api/categories"), // Make sure these endpoints exist
-          fetch("/api/projects"),
-        ]);
-
-        if (!categoriesRes.ok || !projectsRes.ok) {
-          throw new Error("Failed to fetch data");
-        }
-
-        const categoriesData = await categoriesRes.json();
-        const projectsData = await projectsRes.json();
-
-        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
-        setProjects(Array.isArray(projectsData) ? projectsData : []);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        toast.error("Failed to load categories & projects");
-      } finally {
-        setIsDataLoading(false); // Stop showing loading state
-      }
-    };
-
-    fetchCategoriesAndProjects();
-  }, []);
-
   // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
       const response = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...task,
-          priority: parseInt(task.priority),
-          categoryId: task.categoryId ? parseInt(task.categoryId) : null,
-          projectId: task.projectId ? parseInt(task.projectId) : null,
+          ...values,
+          priority: parseInt(values.priority),
+          dueDate: values.dueDate?.toISOString(), // Convert to ISO string
         }),
       });
 
@@ -209,13 +70,7 @@ export default function TaskForm() {
         throw new Error("Failed to create task");
       }
 
-      setTask({
-        title: "",
-        description: "",
-        priority: "0",
-        categoryId: "",
-        projectId: "",
-      });
+      form.reset();
       toast.success("Task created successfully");
       router.refresh();
     } catch (error) {
@@ -227,96 +82,112 @@ export default function TaskForm() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 bg-card p-6 rounded-lg shadow-sm"
-    >
-      {/* Show a loading message while categories/projects are loading */}
-      {isDataLoading ? (
-        <p className="text-center text-gray-500">
-          Loading categories & projects...
-        </p>
-      ) : (
-        <>
-          {/* Task Title */}
-          <Input
-            placeholder="Task title"
-            value={task.title}
-            onChange={(e) => setTask({ ...task, title: e.target.value })}
-            required
-          />
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4 bg-card p-6 rounded-lg shadow-sm"
+      >
+        {/* Task Title */}
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Task Title</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter task title" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          {/* Task Description */}
-          <Textarea
-            placeholder="Task description"
-            value={task.description}
-            onChange={(e) => setTask({ ...task, description: e.target.value })}
-            className="min-h-[100px]"
-          />
+        {/* Task Description */}
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description (optional)</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Enter task description"
+                  className="min-h-[100px]"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          {/* Priority Selection */}
-          <Select
-            value={task.priority}
-            onValueChange={(value) => setTask({ ...task, priority: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select priority" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="0">Low</SelectItem>
-              <SelectItem value="1">Medium</SelectItem>
-              <SelectItem value="2">High</SelectItem>
-            </SelectContent>
-          </Select>
+        {/* Project Name */}
+        <FormField
+          control={form.control}
+          name="project"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Project (optional)</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter project name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          {/* Category Selection */}
-          <Select
-            value={task.categoryId}
-            onValueChange={(value) => setTask({ ...task, categoryId: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.length > 0 ? (
-                categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id.toString()}>
-                    {category.name}
-                  </SelectItem>
-                ))
-              ) : (
-                <SelectItem disabled value={"value"}>No categories found</SelectItem>
-              )}
-            </SelectContent>
-          </Select>
+        {/* Priority Selection */}
+        <FormField
+          control={form.control}
+          name="priority"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Priority</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select priority" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="0">Low</SelectItem>
+                  <SelectItem value="1">Medium</SelectItem>
+                  <SelectItem value="2">High</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          {/* Project Selection */}
-          <Select
-            value={task.projectId}
-            onValueChange={(value) => setTask({ ...task, projectId: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select project" />
-            </SelectTrigger>
-            <SelectContent>
-              {projects.length > 0 ? (
-                projects.map((project) => (
-                  <SelectItem key={project.id} value={project.id.toString()}>
-                    {project.name}
-                  </SelectItem>
-                ))
-              ) : (
-                <SelectItem disabled value={"value"}>No projects found</SelectItem>
-              )}
-            </SelectContent>
-          </Select>
+        {/* Due Date Calendar */}
+        <FormField
+          control={form.control}
+          name="dueDate"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Due Date (optional)</FormLabel>
+              <FormControl>
+                <DatePicker
+                  selected={field.value}
+                  onChange={(date) => field.onChange(date)}
+                  minDate={new Date()} // Prevent selecting past dates
+                  placeholderText="Select due date"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  dateFormat="MMMM d, yyyy"
+                  isClearable
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          {/* Submit Button */}
-          <Button type="submit" disabled={loading}>
-            {loading ? "Creating..." : "Create Task"}
-          </Button>
-        </>
-      )}
-    </form>
+        {/* Submit Button */}
+        <Button type="submit" disabled={loading}>
+          {loading ? "Creating..." : "Create Task"}
+        </Button>
+      </form>
+    </Form>
   );
 }
