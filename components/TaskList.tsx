@@ -2,46 +2,45 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Task, Category, Project } from "@/lib/types";
 import { Button } from "./ui/button";
 import { Checkbox } from "./ui/checkbox";
 import { Badge } from "./ui/badge";
 import { toast } from "sonner";
 
+// Define the Task type based on your schema
+type Task = {
+  id: string;
+  title: string;
+  description: string | null;
+  priority: number;
+  dueDate: string | null;
+  completed: boolean;
+  projectId: number | null;
+  categoryId: number | null;
+  createdAt: string;
+  updatedAt: string;
+};
 
 export default function TaskList() {
   const router = useRouter();
-
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  // Fetch tasks from the backend
+  const fetchTasks = async () => {
     try {
-      const [tasksRes, categoriesRes, projectsRes] = await Promise.all([
-        fetch("/api/tasks"),
-        fetch("/api/categories"),
-        fetch("/api/projects"),
-      ]);
+      const response = await fetch("/api/tasks");
 
-      if (!tasksRes.ok || !categoriesRes.ok || !projectsRes.ok) {
-        throw new Error("Failed to fetch data");
+      if (!response.ok) {
+        throw new Error("Failed to fetch tasks");
       }
 
-      const [tasksData, categoriesData, projectsData] = await Promise.all([
-        tasksRes.json(),
-        categoriesRes.json(),
-        projectsRes.json(),
-      ]);
-
+      const tasksData = await response.json();
       setTasks(Array.isArray(tasksData) ? tasksData : []);
-      setCategories(Array.isArray(categoriesData) ? categoriesData : []);
-      setProjects(Array.isArray(projectsData) ? projectsData : []);
     } catch (error) {
-      setError("Failed to fetch data. Please try again later.");
-      toast.error("Failed to fetch data");
+      setError("Failed to fetch tasks. Please try again later.");
+      toast.error("Failed to fetch tasks");
       console.error("Fetch error:", error);
     } finally {
       setLoading(false);
@@ -49,12 +48,13 @@ export default function TaskList() {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchTasks();
   }, []);
 
+  // Toggle task completion status
   const toggleTaskStatus = async (task: Task) => {
     try {
-      const response = await fetch("/api/tasks", {
+      const response = await fetch(`/api/tasks`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...task, completed: !task.completed }),
@@ -62,7 +62,7 @@ export default function TaskList() {
 
       if (!response.ok) throw new Error("Failed to update task");
 
-      await fetchData();
+      await fetchTasks(); // Refresh the data
       toast.success("Task updated successfully");
     } catch (error) {
       console.error("Failed to update task:", error);
@@ -70,6 +70,7 @@ export default function TaskList() {
     }
   };
 
+  // Delete a task
   const deleteTask = async (taskId: string) => {
     try {
       const response = await fetch(`/api/tasks?id=${taskId}`, {
@@ -78,7 +79,7 @@ export default function TaskList() {
 
       if (!response.ok) throw new Error("Failed to delete task");
 
-      await fetchData();
+      await fetchTasks(); // Refresh the data
       toast.success("Task deleted successfully");
     } catch (error) {
       console.error("Failed to delete task:", error);
@@ -86,6 +87,7 @@ export default function TaskList() {
     }
   };
 
+  // Get priority label with styling
   const getPriorityLabel = (priority: number) => {
     switch (priority) {
       case 2:
@@ -97,78 +99,74 @@ export default function TaskList() {
     }
   };
 
+  // Loading state
   if (loading) {
-    return <div className="text-center py-4">Loading data...</div>;
+    return <div className="text-center py-4">Loading tasks...</div>;
   }
 
+  // Error state
   if (error) {
     return <div className="text-center text-red-500 py-4">{error}</div>;
+  }
+
+  // No tasks state
+  if (tasks.length === 0) {
+    return (
+      <div className="text-center text-muted-foreground py-4">
+        No tasks found. Create one to get started!
+      </div>
+    );
   }
 
   return (
     <div className="space-y-4">
       <h1 className="font-extrabold text-2xl mt-3 mb-3">Pending Tasks</h1>
-      {tasks.length === 0 ? (
-        <p className="text-center text-muted-foreground">
-          No tasks yet. Create one above!
-        </p>
-      ) : (
-        tasks.map((task) => {
-          const taskCategory = categories.find(
-            (cat) => cat.id === task.categoryId
-          );
-          const taskProject = projects.find(
-            (proj) => proj.id === task.projectId
-          );
-
-          return (
-            <div
-              key={task.id}
-              className={`flex flex-col p-4 rounded-lg border shadow-sm ${
-                task.completed ? "opacity-60" : ""
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    checked={task.completed}
-                    onCheckedChange={() => toggleTaskStatus(task)}
-                  />
-                  <span
-                    className={`text-sm font-medium ${
-                      task.completed ? "line-through text-gray-500" : ""
-                    }`}
-                  >
-                    {task.title}
-                  </span>
-                </div>
-                <div className="flex items-center gap-4">
-                  {getPriorityLabel(task.priority)}
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => deleteTask(task.id)}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </div>
-
-              {/* Display category and project */}
-              <div className="flex gap-2 mt-2 text-sm text-gray-600">
-                {taskCategory && (
-                  <Badge style={{ backgroundColor: taskCategory.color }}>
-                    {taskCategory.name}
-                  </Badge>
-                )}
-                {taskProject && (
-                  <Badge variant="secondary">{taskProject.name}</Badge>
-                )}
-              </div>
+      {tasks.map((task) => (
+        <div
+          key={task.id}
+          className={`flex flex-col p-4 rounded-lg border shadow-sm ${
+            task.completed ? "opacity-60" : ""
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                checked={task.completed}
+                onCheckedChange={() => toggleTaskStatus(task)}
+              />
+              <span
+                className={`text-sm font-medium ${
+                  task.completed ? "line-through text-gray-500" : ""
+                }`}
+              >
+                {task.title}
+              </span>
             </div>
-          );
-        })
-      )}
+            <div className="flex items-center gap-4">
+              {getPriorityLabel(task.priority)}
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => deleteTask(task.id)}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+
+          {/* Display description if available */}
+          {task.description && (
+            <div className="mt-2 text-sm text-gray-600">{task.description}</div>
+          )}
+
+          {/* Display due date if available */}
+          {task.dueDate && (
+            <div className="mt-2 text-sm text-gray-500">
+              Due: {new Date(task.dueDate).toLocaleDateString()}
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

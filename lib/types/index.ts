@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export interface Task {
   id: string;
   title: string;
@@ -12,7 +14,10 @@ export interface Task {
   updatedAt: Date;
 }
 
+export type Color = string; // Define Color type
+
 export interface Project {
+  color: Color | undefined;
   id: number;
   name: string;
   description?: string;
@@ -21,6 +26,7 @@ export interface Project {
 }
 
 export interface Category {
+  icon: ReactNode;
   id: number;
   name: string;
   color: string;

@@ -21,14 +21,14 @@ import { CalendarCard } from "@/components/CalendarCard";
 
 const mockTasks = [
   {
-    id: 1,
+    id: "1",
     title: "Complete project proposal",
     dueDate: "2024-05-20",
     completed: false,
   },
-  { id: 2, title: "Fix UI bugs", dueDate: "2024-05-18", completed: true },
+  { id: "2", title: "Fix UI bugs", dueDate: "2024-05-18", completed: true },
   {
-    id: 3,
+    id: "3",
     title: "Prepare presentation",
     dueDate: "2024-05-22",
     completed: false,
@@ -74,7 +74,7 @@ export default function DashboardPage() {
     );
 
   // Handle task completion toggle
-  const toggleTaskCompletion = (taskId: number) => {
+  const toggleTaskCompletion = (taskId: string) => {
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
         task.id === taskId ? { ...task, completed: !task.completed } : task
@@ -84,7 +84,7 @@ export default function DashboardPage() {
   };
 
   // Handle task deletion
-  const deleteTask = (taskId: number) => {
+  const deleteTask = (taskId: string) => {
     setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
     toast.success("Task deleted");
   };
@@ -108,7 +108,7 @@ export default function DashboardPage() {
             <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-140px)]">
               {/* Left Section */}
               <div className="flex flex-col gap-6 lg:w-96 lg:min-w-96">
-                <TaskForm />
+                <TaskForm projects={[]} categories={[]} />
                 <CalendarCard
                   selectedDate={selectedDate}
                   setSelectedDate={setSelectedDate}
