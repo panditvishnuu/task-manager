@@ -15,10 +15,11 @@ import { BackgroundBeams } from "@/components/ui/background-beams";
 
 export default function AuthPage() {
   const router = useRouter();
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(true); // State to toggle between login and signup
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative">
+      {/* Auth Card */}
       <Card className="w-full max-w-md relative z-10">
         <CardHeader>
           <CardTitle>{isLogin ? "Welcome Back" : "Create Account"}</CardTitle>
@@ -29,6 +30,7 @@ export default function AuthPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
+          {/* Show SignIn or SignUp based on state */}
           {isLogin ? (
             <SignIn
               routing="virtual"
@@ -53,6 +55,7 @@ export default function AuthPage() {
             />
           )}
 
+          {/* Divider for alternative auth options */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
@@ -64,6 +67,7 @@ export default function AuthPage() {
             </div>
           </div>
 
+          {/* Toggle between Sign In and Sign Up */}
           <Button
             variant="outline"
             className="w-full"
@@ -75,6 +79,8 @@ export default function AuthPage() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Background animation */}
       <BackgroundBeams />
     </div>
   );

@@ -5,17 +5,19 @@ import { and, eq, gt, sql } from "drizzle-orm";
 
 export async function GET() {
   try {
-    // Execute a single query to get all statistics
+    // Fetching task statistics in a single optimized query
     const stats = await db
       .select({
-        totalTasks: sql<number>`count(*)`,
-        completedTasks: sql<number>`sum(case when ${tasks.completed} = true then 1 else 0 end)`,
-        overdueTasks: sql<number>`sum(case when ${tasks.dueDate} < now() and ${tasks.completed} = false then 1 else 0 end)`,
-        highPriorityTasks: sql<number>`sum(case when ${tasks.priority} = 2 then 1 else 0 end)`,
+        totalTasks: sql<number>`count(*)`, // Total number of tasks
+        completedTasks: sql<number>`sum(case when ${tasks.completed} = true then 1 else 0 end)`, // Count of completed tasks
+        overdueTasks: sql<number>`sum(case when ${tasks.dueDate} < now() and ${tasks.completed} = false then 1 else 0 end)`, // Count of overdue tasks
+        highPriorityTasks: sql<number>`sum(case when ${tasks.priority} = 2 then 1 else 0 end)`, // Count of high-priority tasks
       })
       .from(tasks);
 
     const data = stats[0];
+
+    // Calculating completion percentage
     const completionPercentage =
       data.totalTasks > 0
         ? Math.round(
@@ -23,6 +25,7 @@ export async function GET() {
           )
         : 0;
 
+    // Returning formatted response
     return NextResponse.json({
       totalTasks: Number(data.totalTasks),
       completedTasks: Number(data.completedTasks),

@@ -1,6 +1,7 @@
 import { Calendar } from "./ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
+// Props interface for CalendarCard component
 interface CalendarCardProps {
   selectedDate: Date | undefined;
   setSelectedDate: (date: Date | undefined) => void;

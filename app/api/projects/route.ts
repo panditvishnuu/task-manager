@@ -6,12 +6,15 @@ import { NextResponse } from "next/server";
 // Fetch all projects
 export async function GET() {
   try {
+    // Retrieve all projects from the database, ordered by creation date
     const allProjects = await db
       .select()
       .from(projects)
       .orderBy(projects.createdAt);
+
     return NextResponse.json(allProjects);
   } catch (error) {
+    console.error("Error fetching projects:", error);
     return NextResponse.json(
       { error: "Failed to fetch projects" },
       { status: 500 }
@@ -22,16 +25,21 @@ export async function GET() {
 // Create a new project
 export async function POST(request: Request) {
   try {
+    // Parse request body
     const body = await request.json();
+
+    // Insert new project into the database
     const newProject = await db
       .insert(projects)
       .values({
         name: body.name,
         description: body.description,
       })
-      .returning();
+      .returning(); // Return the newly created project
+
     return NextResponse.json(newProject[0]);
   } catch (error) {
+    console.error("Error creating project:", error);
     return NextResponse.json(
       { error: "Failed to create project" },
       { status: 500 }
@@ -42,18 +50,23 @@ export async function POST(request: Request) {
 // Update an existing project
 export async function PUT(request: Request) {
   try {
+    // Parse request body
     const body = await request.json();
+
+    // Update project details in the database
     const updatedProject = await db
       .update(projects)
       .set({
         name: body.name,
         description: body.description,
-        updatedAt: new Date(),
+        updatedAt: new Date(), // Set updated timestamp
       })
       .where(eq(projects.id, body.id))
-      .returning();
+      .returning(); // Return updated project details
+
     return NextResponse.json(updatedProject[0]);
   } catch (error) {
+    console.error("Error updating project:", error);
     return NextResponse.json(
       { error: "Failed to update project" },
       { status: 500 }
@@ -67,6 +80,7 @@ export async function DELETE(request: Request) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
+    // Ensure project ID is provided
     if (!id) {
       return NextResponse.json(
         { error: "Project ID is required" },
@@ -76,6 +90,7 @@ export async function DELETE(request: Request) {
 
     const numericId = Number(id); // Convert string ID to number
 
+    // Validate if ID is a valid number
     if (isNaN(numericId)) {
       return NextResponse.json(
         { error: "Invalid project ID" },
@@ -83,10 +98,12 @@ export async function DELETE(request: Request) {
       );
     }
 
-    await db.delete(projects).where(eq(projects.id, numericId)); // Pass number
+    // Delete project from the database
+    await db.delete(projects).where(eq(projects.id, numericId));
 
     return NextResponse.json({ message: "Project deleted successfully" });
   } catch (error) {
+    console.error("Error deleting project:", error);
     return NextResponse.json(
       { error: "Failed to delete project" },
       { status: 500 }

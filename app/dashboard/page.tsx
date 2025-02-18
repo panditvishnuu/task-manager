@@ -29,9 +29,6 @@ const mockTasks = [
 
 export default function DashboardPage() {
   const [tasks, setTasks] = useState(mockTasks);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    new Date()
-  );
 
   // Calculate task statistics
   const totalTasks = tasks.length;
@@ -76,7 +73,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background flex">
-      <DashboardSidebar />
+      <DashboardSidebar/>
 
       <div className="flex-1 flex flex-col">
         <DashboardHeader />
