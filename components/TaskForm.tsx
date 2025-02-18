@@ -54,6 +54,7 @@ export default function TaskForm() {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+
   // Fetch categories and projects on component mount
   useEffect(() => {
     const fetchData = async () => {
@@ -127,7 +128,7 @@ export default function TaskForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 bg-card p-6 rounded-lg shadow-sm"
+        className="space-y-3 bg-card p-4 rounded-lg border"
       >
         {/* Task Title */}
         <FormField
@@ -135,11 +136,15 @@ export default function TaskForm() {
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Task Title</FormLabel>
+              <FormLabel className="text-sm">Task Title</FormLabel>
               <FormControl>
-                <Input placeholder="Enter task title" {...field} />
+                <Input
+                  placeholder="Enter task title"
+                  {...field}
+                  className="h-8 text-sm"
+                />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-xs" />
             </FormItem>
           )}
         />
@@ -150,15 +155,15 @@ export default function TaskForm() {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description (optional)</FormLabel>
+              <FormLabel className="text-sm">Description (optional)</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Enter task description"
-                  className="min-h-[100px]"
+                  className="min-h-[80px] text-sm"
                   {...field}
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-xs" />
             </FormItem>
           )}
         />
@@ -169,16 +174,20 @@ export default function TaskForm() {
           name="projectId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Project</FormLabel>
+              <FormLabel className="text-sm">Project</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8 text-sm">
                     <SelectValue placeholder="Select project" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   {projects.map((project) => (
-                    <SelectItem key={project.id} value={project.id.toString()}>
+                    <SelectItem
+                      key={project.id}
+                      value={project.id.toString()}
+                      className="text-sm"
+                    >
                       <div className="flex items-center gap-2">
                         <span
                           className="w-2 h-2 rounded-full"
@@ -190,7 +199,7 @@ export default function TaskForm() {
                   ))}
                 </SelectContent>
               </Select>
-              <FormMessage />
+              <FormMessage className="text-xs" />
             </FormItem>
           )}
         />
@@ -201,10 +210,10 @@ export default function TaskForm() {
           name="categoryId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Category</FormLabel>
+              <FormLabel className="text-sm">Category</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8 text-sm">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                 </FormControl>
@@ -213,6 +222,7 @@ export default function TaskForm() {
                     <SelectItem
                       key={category.id}
                       value={category.id.toString()}
+                      className="text-sm"
                     >
                       <div className="flex items-center gap-2">
                         <span>{category.icon}</span>
@@ -222,7 +232,7 @@ export default function TaskForm() {
                   ))}
                 </SelectContent>
               </Select>
-              <FormMessage />
+              <FormMessage className="text-xs" />
             </FormItem>
           )}
         />
@@ -233,20 +243,26 @@ export default function TaskForm() {
           name="priority"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Priority</FormLabel>
+              <FormLabel className="text-sm">Priority</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8 text-sm">
                     <SelectValue placeholder="Select priority" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="0">Low</SelectItem>
-                  <SelectItem value="1">Medium</SelectItem>
-                  <SelectItem value="2">High</SelectItem>
+                  <SelectItem value="0" className="text-sm">
+                    Low
+                  </SelectItem>
+                  <SelectItem value="1" className="text-sm">
+                    Medium
+                  </SelectItem>
+                  <SelectItem value="2" className="text-sm">
+                    High
+                  </SelectItem>
                 </SelectContent>
               </Select>
-              <FormMessage />
+              <FormMessage className="text-xs" />
             </FormItem>
           )}
         />
@@ -257,14 +273,14 @@ export default function TaskForm() {
           name="dueDate"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Due Date (optional)</FormLabel>
+              <FormLabel className="text-sm">Due Date (optional)</FormLabel>
               <FormControl>
                 <DatePicker
                   selected={field.value}
                   onChange={field.onChange}
                   minDate={new Date()}
                   placeholderText="Select due date"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex h-8 w-full rounded-md border border-input bg-background px-2 text-sm"
                   dateFormat="MMMM d, yyyy"
                   isClearable
                   showTimeSelect
@@ -273,13 +289,13 @@ export default function TaskForm() {
                   timeCaption="Time"
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-xs" />
             </FormItem>
           )}
         />
 
         {/* Submit Button */}
-        <Button type="submit" disabled={loading} className="w-full">
+        <Button type="submit" disabled={loading} className="w-full h-8 text-sm">
           {loading ? "Creating..." : "Create Task"}
         </Button>
       </form>
