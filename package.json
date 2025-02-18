@@ -85,6 +85,7 @@
   "devDependencies": {
     "drizzle-kit": "^0.20.18",
     "postgres": "^3.4.3",
+    "terser-webpack-plugin": "^5.3.11",
     "tsx": "^4.19.2"
   }
 }

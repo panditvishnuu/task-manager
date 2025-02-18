@@ -3,15 +3,12 @@ const nextConfig = {
   // Disable minification to prevent WebSocket issues
   swcMinify: false,
   experimental: {
-    serverActions: true,
+    serverActions: {},
   },
   webpack: (config, { isServer, dev }) => {
     // Optimize WebSocket handling
-    config.externals = [
-      ...(config.externals || []),
-      { bufferutil: "bufferutil", "utf-8-validate": "utf-8-validate" },
-    ];
-
+    config.externals = [...(config.externals || []), { bufferutil: 'bufferutil', 'utf-8-validate': 'utf-8-validate' }];
+    
     // Remove console logs in production
     if (!dev && !isServer) {
       const TerserPlugin = require("terser-webpack-plugin");
