@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Disable minification to prevent WebSocket issues
-  swcMinify: false,
+  swcMinify: true,
   experimental: {
     serverActions: {},
   },
