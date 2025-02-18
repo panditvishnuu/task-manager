@@ -98,3 +98,23 @@
 .dark .neon-border:hover {
   box-shadow: 0 0 12px -2px rgba(99, 102, 241, 0.3);
 }
+
+/* Example CSS for mobile responsiveness */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .lg\:w-96 {
+    width: 100%;
+  }
+
+  .lg\:min-w-96 {
+    min-width: 100%;
+  }
+
+  .h-\[calc\(100vh-140px\)\] {
+    height: auto;
+  }
+}

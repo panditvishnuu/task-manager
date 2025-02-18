@@ -17,6 +17,7 @@ import {
 import { Button } from "./ui/button";
 
 const menuItems = [
+  { name: "Home", icon: LayoutDashboard, path: "/" },
   { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { name: "Tasks", icon: List, path: "#" },
   { name: "Calendar", icon: Calendar, path: "#" },
@@ -39,7 +40,7 @@ export function DashboardSidebar() {
       <div className="p-4 border-b flex items-center justify-between">
         <div className={cn("flex items-center", collapsed && "justify-center")}>
           <Target className="h-6 w-6" />
-          {!collapsed && <span className="ml-2 font-bold">TaskMaster</span>}
+          {!collapsed && <span className="ml-2 font-bold">Taskly</span>}
         </div>
         <Button
           variant="ghost"

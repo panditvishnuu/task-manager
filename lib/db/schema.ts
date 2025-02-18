@@ -7,15 +7,13 @@ import {
   boolean,
   uuid,
 } from "drizzle-orm/pg-core";
-import { desc, relations } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 
 export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   color: text("color").notNull().default("#64748b"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  description: text("description"),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const categories = pgTable("categories", {
@@ -23,7 +21,6 @@ export const categories = pgTable("categories", {
   name: text("name").notNull(),
   icon: text("icon").notNull().default("📝"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  color: text("color").notNull().default("#64748b"),
 });
 
 export const tasks = pgTable("tasks", {

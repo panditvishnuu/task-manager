@@ -22,30 +22,7 @@ export async function GET() {
   }
 }
 
-// Create a new project
-export async function POST(request: Request) {
-  try {
-    // Parse request body
-    const body = await request.json();
 
-    // Insert new project into the database
-    const newProject = await db
-      .insert(projects)
-      .values({
-        name: body.name,
-        description: body.description,
-      })
-      .returning(); // Return the newly created project
-
-    return NextResponse.json(newProject[0]);
-  } catch (error) {
-    console.error("Error creating project:", error);
-    return NextResponse.json(
-      { error: "Failed to create project" },
-      { status: 500 }
-    );
-  }
-}
 
 // Update an existing project
 export async function PUT(request: Request) {
@@ -58,8 +35,6 @@ export async function PUT(request: Request) {
       .update(projects)
       .set({
         name: body.name,
-        description: body.description,
-        updatedAt: new Date(), // Set updated timestamp
       })
       .where(eq(projects.id, body.id))
       .returning(); // Return updated project details

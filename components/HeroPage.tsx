@@ -14,7 +14,7 @@ import {
 
 export default function Home() {
   const heroText =
-    "Welcome to TaskMaster, your ultimate task management solution. Stay organized, boost productivity, and achieve your goals with our intuitive platform.";
+    "Welcome to Taskly, your ultimate task management solution. Stay organized, boost productivity, and achieve your goals with our intuitive platform.";
 
   return (
     <div className="min-h-screen bg-background">
@@ -27,7 +27,7 @@ export default function Home() {
         <header className="fixed top-0 left-0 right-0 px-6 py-4 flex justify-between items-center border-b bg-background/50 backdrop-blur-sm z-20">
           <div className="flex items-center space-x-2">
             <Target className="h-6 w-6" />
-            <h1 className="text-2xl font-bold">TaskMaster</h1>
+            <h1 className="text-2xl font-bold">Taskly</h1>
           </div>
           <div className="flex items-center space-x-4">
             <nav className="hidden md:flex space-x-6">
@@ -145,6 +145,7 @@ export default function Home() {
               <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                 {[
                   {
+                    Link: "/auth",
                     title: "Starter",
                     price: "0",
                     description: "Perfect for individuals getting started",
@@ -156,6 +157,7 @@ export default function Home() {
                     ],
                   },
                   {
+                    Link: "#",
                     title: "Professional",
                     price: "9",
                     description: "For teams and power users",
@@ -170,6 +172,7 @@ export default function Home() {
                     popular: true,
                   },
                   {
+                    Link: "#",
                     title: "Enterprise",
                     price: "Custom",
                     description: "Tailored for organizations",
@@ -211,12 +214,14 @@ export default function Home() {
                         </li>
                       ))}
                     </ul>
-                    <Button
-                      className="w-full"
-                      variant={plan.popular ? "default" : "outline"}
-                    >
-                      Get Started
-                    </Button>
+                    <Link href={plan.Link}>
+                      <Button
+                        className="w-full"
+                        variant={plan.popular ? "default" : "outline"}
+                      >
+                        Get Started
+                      </Button>
+                    </Link>
                   </div>
                 ))}
               </div>

@@ -18,21 +18,24 @@ export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true); // State to toggle between login and signup
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative safe-area">
       {/* Auth Card */}
-      <Card className="w-full max-w-md relative z-10">
+      <Card className="w-full max-w-[90%] sm:max-w-md relative z-10">
         <CardHeader>
-          <CardTitle>{isLogin ? "Welcome Back" : "Create Account"}</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl sm:text-3xl text-center">
+            {isLogin ? "Welcome Back" : "Create Account"}
+          </CardTitle>
+          <CardDescription className="text-center text-muted-foreground">
             {isLogin
               ? "Enter your credentials to access your account"
               : "Fill in your details to create a new account"}
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-4">
+        <CardContent className="flex flex-col gap-4 items-center justify-center">
           {/* Show SignIn or SignUp based on state */}
           {isLogin ? (
             <SignIn
+            
               routing="virtual"
               afterSignInUrl="/dashboard"
               appearance={{
@@ -81,7 +84,7 @@ export default function AuthPage() {
       </Card>
 
       {/* Background animation */}
-      <BackgroundBeams />
+      <BackgroundBeams className="absolute inset-0 z-0" />
     </div>
   );
 }
